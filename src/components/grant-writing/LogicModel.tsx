@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Plus, Trash2, ArrowRight } from 'lucide-react';
+import { Plus, Trash2, ArrowRight, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +19,7 @@ interface LogicModelData {
 }
 
 export const LogicModel = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
   const [logicModel, setLogicModel] = useState<LogicModelData>({
     inputs: [
       { id: '1', text: 'Funding: $372,743 over 3 years' },
@@ -47,6 +47,46 @@ export const LogicModel = () => {
       { id: '3', text: 'Improved long-term economic outcomes' }
     ]
   });
+
+  const generateLogicModel = async () => {
+    setIsGenerating(true);
+    // Simulate API call to generate logic model based on grant context
+    setTimeout(() => {
+      const generatedModel: LogicModelData = {
+        inputs: [
+          { id: '1', text: 'Federal grant funding: $500,000 over 3 years' },
+          { id: '2', text: 'Dedicated staff: 2 FTE program coordinators' },
+          { id: '3', text: 'Community partnerships: 5 local organizations' },
+          { id: '4', text: 'Facility space: Community center locations' }
+        ],
+        activities: [
+          { id: '1', text: 'Monthly community workshops on financial literacy' },
+          { id: '2', text: 'One-on-one mentoring sessions' },
+          { id: '3', text: 'Quarterly community forums and networking events' },
+          { id: '4', text: 'Digital resource platform development' }
+        ],
+        outputs: [
+          { id: '1', text: '300 individuals trained in financial literacy' },
+          { id: '2', text: '120 mentoring relationships established' },
+          { id: '3', text: '12 community forums conducted' },
+          { id: '4', text: '1 comprehensive digital platform launched' }
+        ],
+        outcomes: [
+          { id: '1', text: '75% of participants increase their savings rate' },
+          { id: '2', text: '60% of participants secure stable employment' },
+          { id: '3', text: '85% report improved financial confidence' },
+          { id: '4', text: '40% start or expand small businesses' }
+        ],
+        impacts: [
+          { id: '1', text: 'Reduced community poverty rate by 15%' },
+          { id: '2', text: 'Increased local economic activity and entrepreneurship' },
+          { id: '3', text: 'Strengthened community resilience and social cohesion' }
+        ]
+      };
+      setLogicModel(generatedModel);
+      setIsGenerating(false);
+    }, 2000);
+  };
 
   const addItem = (column: keyof LogicModelData) => {
     const newItem: LogicModelItem = {
@@ -85,11 +125,22 @@ export const LogicModel = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Logic Model</h3>
-        <p className="text-sm text-gray-600">
-          Map out how your program's inputs and activities will lead to the intended outcomes and impacts.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Logic Model</h3>
+          <p className="text-sm text-gray-600">
+            Map out how your program's inputs and activities will lead to the intended outcomes and impacts.
+          </p>
+        </div>
+        <Button 
+          onClick={generateLogicModel} 
+          disabled={isGenerating}
+          variant="outline"
+          size="sm"
+        >
+          <Wand2 className="w-4 h-4 mr-2" />
+          {isGenerating ? 'Generating...' : 'Generate Logic Model'}
+        </Button>
       </div>
 
       <div className="grid grid-cols-5 gap-4">

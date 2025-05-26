@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Plus, Trash2, Calculator } from 'lucide-react';
+import { Plus, Trash2, Calculator, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -56,6 +55,64 @@ export const BudgetGrid = () => {
     }
   ]);
 
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generateBudget = async () => {
+    setIsGenerating(true);
+    // Simulate API call to generate budget based on grant context
+    setTimeout(() => {
+      const generatedItems: BudgetItem[] = [
+        {
+          id: Date.now().toString(),
+          category: 'Personnel',
+          description: 'Project Manager (1.0 FTE)',
+          year1: 65000,
+          year2: 66950,
+          year3: 68959,
+          total: 200909
+        },
+        {
+          id: (Date.now() + 1).toString(),
+          category: 'Personnel', 
+          description: 'Research Assistant (0.5 FTE)',
+          year1: 20000,
+          year2: 20600,
+          year3: 21218,
+          total: 61818
+        },
+        {
+          id: (Date.now() + 2).toString(),
+          category: 'Equipment',
+          description: 'Technology and Software',
+          year1: 15000,
+          year2: 3000,
+          year3: 3000,
+          total: 21000
+        },
+        {
+          id: (Date.now() + 3).toString(),
+          category: 'Travel',
+          description: 'Conference and Training',
+          year1: 5000,
+          year2: 5000,
+          year3: 5000,
+          total: 15000
+        },
+        {
+          id: (Date.now() + 4).toString(),
+          category: 'Administrative',
+          description: 'Indirect Costs (20%)',
+          year1: 21000,
+          year2: 19110,
+          year3: 19635,
+          total: 59745
+        }
+      ];
+      setBudgetItems(generatedItems);
+      setIsGenerating(false);
+    }, 2000);
+  };
+
   const addBudgetItem = () => {
     const newItem: BudgetItem = {
       id: Date.now().toString(),
@@ -100,10 +157,21 @@ export const BudgetGrid = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Project Budget</h3>
-        <Button onClick={addBudgetItem} size="sm">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Line Item
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button 
+            onClick={generateBudget} 
+            disabled={isGenerating}
+            variant="outline"
+            size="sm"
+          >
+            <Wand2 className="w-4 h-4 mr-2" />
+            {isGenerating ? 'Generating...' : 'Generate Budget'}
+          </Button>
+          <Button onClick={addBudgetItem} size="sm">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Line Item
+          </Button>
+        </div>
       </div>
 
       <Card>
