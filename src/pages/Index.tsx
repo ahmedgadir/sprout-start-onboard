@@ -512,65 +512,149 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Programs Section */}
-          <div>
+          {/* Programs Section - Improved */}
+          <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <Label className="text-lg font-semibold text-[#1B4332]">Programs</Label>
+              <div>
+                <Label className="text-lg font-semibold text-[#1B4332]">Programs</Label>
+                <p className="text-sm text-gray-600 mt-1">Add your organization's key programs and initiatives</p>
+              </div>
               <Button
                 onClick={addProgram}
-                variant="outline"
-                className="text-[#2C6E49] border-[#2C6E49] hover:bg-[#D8F3DC]"
+                className="bg-[#2C6E49] hover:bg-[#1B4332] text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Program
               </Button>
             </div>
 
+            {/* Auto-suggest Panel */}
+            <div className="bg-[#D8F3DC] border border-[#4C956C] rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-[#2C6E49] rounded-full"></div>
+                  <span className="text-sm font-medium text-[#1B4332]">Smart Program Detection</span>
+                </div>
+                <span className="text-xs text-gray-600">Found 0 programs from uploaded documents</span>
+              </div>
+              <p className="text-sm text-gray-700 mb-3">
+                Upload your annual report or impact documents to auto-detect existing programs.
+              </p>
+              <div className="flex space-x-2">
+                <Button size="sm" variant="outline" className="text-[#2C6E49] border-[#2C6E49]">
+                  Add All
+                </Button>
+                <Button size="sm" variant="outline" className="text-[#2C6E49] border-[#2C6E49]">
+                  Review Individually
+                </Button>
+              </div>
+            </div>
+
+            {/* Programs List */}
             {programData.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p>No programs added yet. Click "Add Program" to get started.</p>
+              <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Target className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No programs added yet</h3>
+                <p className="text-gray-500 mb-4">Start by adding your first program to help us understand your impact.</p>
+                <Button
+                  onClick={addProgram}
+                  variant="outline"
+                  className="text-[#2C6E49] border-[#2C6E49] hover:bg-[#D8F3DC]"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Your First Program
+                </Button>
               </div>
             ) : (
-              <div className="space-y-4 mt-4">
-                {programData.map((program) => (
-                  <div key={program.id} className="grid grid-cols-5 gap-4 p-4 border border-gray-200 rounded-lg">
-                    <Input
-                      placeholder="Program Name ⭐"
-                      value={program.name}
-                      onChange={(e) => updateProgram(program.id, 'name', e.target.value)}
-                    />
-                    <Input
-                      placeholder="Focus Area (optional)"
-                      value={program.focusArea}
-                      onChange={(e) => updateProgram(program.id, 'focusArea', e.target.value)}
-                    />
-                    <Input
-                      placeholder="Annual Budget USD (optional)"
-                      value={program.budget}
-                      onChange={(e) => updateProgram(program.id, 'budget', e.target.value)}
-                    />
-                    <Input
-                      placeholder="Target Population (optional)"
-                      value={program.targetPopulation}
-                      onChange={(e) => updateProgram(program.id, 'targetPopulation', e.target.value)}
-                    />
-                    <div className="flex space-x-2">
-                      <Input
-                        placeholder="Key Outcome (optional)"
-                        value={program.outcome}
-                        onChange={(e) => updateProgram(program.id, 'outcome', e.target.value)}
-                        className="flex-1"
-                      />
+              <div className="space-y-4">
+                {programData.map((program, index) => (
+                  <Card key={program.id} className="p-6 border border-gray-200">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center space-x-2">
+                        <span className="flex items-center justify-center w-6 h-6 bg-[#2C6E49] text-white text-xs font-medium rounded-full">
+                          {index + 1}
+                        </span>
+                        <Label className="text-sm font-medium text-[#1B4332]">Program {index + 1}</Label>
+                      </div>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => removeProgram(program.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
                       >
                         <X className="w-4 h-4" />
                       </Button>
                     </div>
-                  </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor={`program-name-${program.id}`} className="text-sm font-medium text-[#1B4332]">
+                          Program Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id={`program-name-${program.id}`}
+                          placeholder="e.g., After-School Tutoring"
+                          value={program.name}
+                          onChange={(e) => updateProgram(program.id, 'name', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor={`program-focus-${program.id}`} className="text-sm font-medium text-[#1B4332]">
+                          Focus Area
+                        </Label>
+                        <Input
+                          id={`program-focus-${program.id}`}
+                          placeholder="e.g., Education"
+                          value={program.focusArea}
+                          onChange={(e) => updateProgram(program.id, 'focusArea', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor={`program-budget-${program.id}`} className="text-sm font-medium text-[#1B4332]">
+                          Annual Budget (USD)
+                        </Label>
+                        <Input
+                          id={`program-budget-${program.id}`}
+                          placeholder="e.g., $50,000"
+                          value={program.budget}
+                          onChange={(e) => updateProgram(program.id, 'budget', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor={`program-population-${program.id}`} className="text-sm font-medium text-[#1B4332]">
+                          Target Population
+                        </Label>
+                        <Input
+                          id={`program-population-${program.id}`}
+                          placeholder="e.g., Low-income students"
+                          value={program.targetPopulation}
+                          onChange={(e) => updateProgram(program.id, 'targetPopulation', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <Label htmlFor={`program-outcome-${program.id}`} className="text-sm font-medium text-[#1B4332]">
+                          Key Outcome Metric
+                        </Label>
+                        <Input
+                          id={`program-outcome-${program.id}`}
+                          placeholder="e.g., 85% of students improve reading level"
+                          value={program.outcome}
+                          onChange={(e) => updateProgram(program.id, 'outcome', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </Card>
                 ))}
               </div>
             )}
