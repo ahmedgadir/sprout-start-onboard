@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import GrantDiscovery from "./pages/GrantDiscovery";
 import GrantWriting from "./pages/GrantWriting";
 import NotFound from "./pages/NotFound";
+import { ContextWizard } from "./components/grant-writing/ContextWizard";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/discovery" element={<GrantDiscovery />} />
+          <Route path="/context/:grantId" element={<ContextWizard />} />
           <Route path="/writing/:grantId" element={<GrantWriting />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

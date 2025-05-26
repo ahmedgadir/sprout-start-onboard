@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -113,6 +114,7 @@ const newGrants: NewGrant[] = [
 ];
 
 export const GrantPipelineKanban = () => {
+  const navigate = useNavigate();
   const [grants, setGrants] = useState(sampleGrants);
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(['researching', 'drafting']));
   const [draggedGrant, setDraggedGrant] = useState<number | null>(null);
