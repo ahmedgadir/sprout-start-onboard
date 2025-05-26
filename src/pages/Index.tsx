@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ const FOCUS_AREAS = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [formData, setFormData] = useState({
@@ -888,7 +890,10 @@ const Index = () => {
       </div>
 
       <div className="text-center mt-8">
-        <Button className="h-14 px-8 text-lg bg-[#2C6E49] hover:bg-[#1B4332] text-white">
+        <Button 
+          className="h-14 px-8 text-lg bg-[#2C6E49] hover:bg-[#1B4332] text-white"
+          onClick={() => navigate('/dashboard')}
+        >
           Find My Grants →
         </Button>
       </div>
