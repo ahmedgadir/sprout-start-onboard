@@ -356,8 +356,8 @@ export const GrantPipelineKanban = () => {
       {/* Split View Layout when grant is selected */}
       {selectedGrant ? (
         <div className="flex-1 flex gap-6 min-h-0">
-          {/* Left Pane - Grant List */}
-          <div className="w-1/2 space-y-3 overflow-y-auto">
+          {/* Left Pane - Grant List - Changed from w-1/2 to w-[55%] */}
+          <div className="w-[55%] space-y-3 overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Pipeline Grants</h3>
             {stages.map((stage) => {
               const stageGrants = getGrantsForStage(stage.id);
@@ -421,8 +421,8 @@ export const GrantPipelineKanban = () => {
             })}
           </div>
 
-          {/* Right Pane - Preview Drawer */}
-          <div className="w-1/2 bg-white border border-gray-200 rounded-lg flex flex-col">
+          {/* Right Pane - Preview Drawer - Changed from w-1/2 to w-[45%] */}
+          <div className="w-[45%] bg-white border border-gray-200 rounded-lg flex flex-col">
             {/* Header */}
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <div className="flex items-center space-x-3">
