@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Plus, Calendar, DollarSign, Filter, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+import { MoreHorizontal, Plus, Calendar, DollarSign, Filter, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const columns = [
   { id: 'ideas', title: 'Ideas & Leads', count: 3, color: 'bg-slate-50 border-slate-200', headerColor: 'bg-slate-100' },
@@ -48,10 +49,45 @@ const sampleGrants = [
     description: 'Climate change resilience and adaptation strategies in urban areas',
     priority: 'high',
   },
+  {
+    id: 4,
+    title: 'Digital Literacy Program',
+    funder: 'Google Foundation',
+    amount: 75000,
+    deadline: '2024-05-30',
+    assignees: ['AB'],
+    status: 'ready',
+    description: 'Teaching digital skills to elderly populations in rural areas',
+    priority: 'medium',
+  },
+  {
+    id: 5,
+    title: 'Arts Access Initiative',
+    funder: 'National Arts Council',
+    amount: 125000,
+    deadline: '2024-07-15',
+    assignees: ['CD', 'EF'],
+    status: 'submitted',
+    description: 'Expanding arts education programs in underserved schools',
+    priority: 'low',
+  },
+  {
+    id: 6,
+    title: 'Clean Water Project',
+    funder: 'Gates Foundation',
+    amount: 300000,
+    deadline: '2024-08-01',
+    assignees: ['JD', 'MK', 'GH'],
+    status: 'reporting',
+    description: 'Installing water filtration systems in developing communities',
+    priority: 'high',
+  },
 ];
 
 export const GrantPipelineKanban = () => {
   const [grants, setGrants] = useState(sampleGrants);
+  const [visibleColumns, setVisibleColumns] = useState(0);
+  const columnsPerView = 3;
 
   const getGrantsForColumn = (columnId: string) => {
     return grants.filter(grant => grant.status === columnId);
@@ -82,119 +118,168 @@ export const GrantPipelineKanban = () => {
     }
   };
 
+  const canScrollPrev = visibleColumns > 0;
+  const canScrollNext = visibleColumns + columnsPerView < columns.length;
+
+  const scrollPrev = () => {
+    if (canScrollPrev) {
+      setVisibleColumns(prev => Math.max(0, prev - 1));
+    }
+  };
+
+  const scrollNext = () => {
+    if (canScrollNext) {
+      setVisibleColumns(prev => Math.min(columns.length - columnsPerView, prev + 1));
+    }
+  };
+
+  const visibleColumnsData = columns.slice(visibleColumns, visibleColumns + columnsPerView);
+
   return (
-    <Card className="p-8 h-full bg-white shadow-sm">
+    <Card className="p-6 h-full bg-white shadow-sm">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-bold text-gray-900">Grant Pipeline</h2>
-          <p className="text-gray-600 text-lg">
+          <h2 className="text-2xl font-bold text-gray-900">Grant Pipeline</h2>
+          <p className="text-gray-600">
             {grants.length} active grants • ${grants.reduce((sum, grant) => sum + grant.amount, 0).toLocaleString()} in pipeline
           </p>
         </div>
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" size="default" className="h-10">
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" size="sm">
             <Filter className="w-4 h-4 mr-2" />
             Filter & Sort
           </Button>
-          <Button size="default" className="bg-[#2C6E49] hover:bg-[#1B4332] h-10">
+          <Button size="sm" className="bg-[#2C6E49] hover:bg-[#1B4332]">
             <Plus className="w-4 h-4 mr-2" />
             Add New Grant
           </Button>
         </div>
       </div>
 
-      {/* Horizontal Kanban Board */}
-      <div className="flex space-x-6 h-[700px] overflow-x-auto pb-4">
-        {columns.map((column) => (
-          <div key={column.id} className="flex-shrink-0 w-80">
+      {/* Navigation Controls */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={scrollPrev}
+            disabled={!canScrollPrev}
+            className="h-8 w-8 p-0"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <span className="text-sm text-gray-600">
+            Showing {visibleColumns + 1}-{Math.min(visibleColumns + columnsPerView, columns.length)} of {columns.length} stages
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+            className="h-8 w-8 p-0"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+        <div className="flex space-x-1">
+          {columns.map((_, index) => (
+            <div
+              key={index}
+              className={`w-2 h-2 rounded-full ${
+                index >= visibleColumns && index < visibleColumns + columnsPerView
+                  ? 'bg-[#2C6E49]'
+                  : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Kanban Board */}
+      <div className="grid grid-cols-3 gap-4 h-[500px]">
+        {visibleColumnsData.map((column) => (
+          <div key={column.id} className="flex flex-col">
             {/* Column Header */}
-            <div className={`p-4 rounded-t-xl border-b-2 ${column.headerColor} border-gray-200`}>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-gray-900 text-lg">{column.title}</h3>
-                <div className="flex items-center space-x-2">
-                  <span className="bg-white text-gray-700 text-sm font-medium px-3 py-1 rounded-full shadow-sm">
-                    {getGrantsForColumn(column.id).length}
-                  </span>
-                </div>
+            <div className={`p-3 rounded-t-lg border-b-2 ${column.headerColor} border-gray-200`}>
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="font-semibold text-gray-900 text-sm">{column.title}</h3>
+                <span className="bg-white text-gray-700 text-xs font-medium px-2 py-1 rounded-full shadow-sm">
+                  {getGrantsForColumn(column.id).length}
+                </span>
               </div>
-              <div className="text-sm text-gray-600">
-                ${getGrantsForColumn(column.id).reduce((sum, grant) => sum + grant.amount, 0).toLocaleString()} total
+              <div className="text-xs text-gray-600">
+                ${getGrantsForColumn(column.id).reduce((sum, grant) => sum + grant.amount, 0).toLocaleString()}
               </div>
             </div>
 
             {/* Column Content */}
-            <div className={`h-full rounded-b-xl border-l border-r border-b ${column.color} p-4 space-y-4 overflow-y-auto`} style={{ maxHeight: '620px' }}>
+            <div className={`flex-1 rounded-b-lg border-l border-r border-b ${column.color} p-3 space-y-2 overflow-y-auto`}>
               {getGrantsForColumn(column.id).map((grant) => (
                 <div
                   key={grant.id}
-                  className="bg-white border border-gray-200 rounded-xl p-5 cursor-move hover:shadow-lg transition-all duration-300 group hover:-translate-y-1"
+                  className="bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-all duration-200 group"
                   draggable
                 >
                   {/* Grant Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#2C6E49] to-[#4C956C] rounded-lg text-white text-sm flex items-center justify-center font-bold shadow-sm">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 bg-gradient-to-br from-[#2C6E49] to-[#4C956C] rounded text-white text-xs flex items-center justify-center font-bold">
                         {grant.funder.charAt(0)}
                       </div>
-                      <div className={`w-3 h-3 rounded-full ${getPriorityColor(grant.priority)}`} title={`${grant.priority} priority`}></div>
+                      <div className={`w-2 h-2 rounded-full ${getPriorityColor(grant.priority)}`} title={`${grant.priority} priority`}></div>
                     </div>
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-100 rounded-lg">
-                      <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded">
+                      <MoreHorizontal className="w-3 h-3 text-gray-500" />
                     </button>
                   </div>
 
                   {/* Grant Title & Funder */}
-                  <div className="mb-4">
-                    <h4 className="font-semibold text-gray-900 mb-1 text-lg leading-tight">
+                  <div className="mb-2">
+                    <h4 className="font-semibold text-gray-900 mb-1 text-sm leading-tight line-clamp-2">
                       {grant.title}
                     </h4>
-                    <p className="text-sm text-gray-600 font-medium">{grant.funder}</p>
+                    <p className="text-xs text-gray-600 font-medium">{grant.funder}</p>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-2">
-                    {grant.description}
-                  </p>
-
                   {/* Amount */}
-                  <div className="flex items-center space-x-2 mb-4 p-3 bg-gray-50 rounded-lg">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                    <span className="text-lg font-bold text-gray-900">
+                  <div className="flex items-center space-x-1 mb-2 p-2 bg-gray-50 rounded">
+                    <DollarSign className="w-3 h-3 text-green-600" />
+                    <span className="text-sm font-bold text-gray-900">
                       ${grant.amount.toLocaleString()}
                     </span>
                   </div>
 
                   {/* Deadline */}
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Calendar className="w-4 h-4 text-gray-500" />
+                  <div className="flex items-center space-x-1 mb-2">
+                    <Calendar className="w-3 h-3 text-gray-500" />
                     <Badge
                       variant="outline"
-                      className={`text-sm font-medium ${getDeadlineColor(grant.deadline)}`}
+                      className={`text-xs ${getDeadlineColor(grant.deadline)}`}
                     >
-                      {getDaysUntilDeadline(grant.deadline)} days remaining
+                      {getDaysUntilDeadline(grant.deadline)}d
                     </Badge>
                   </div>
 
                   {/* Team */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">Team</span>
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-3 h-3 text-gray-500" />
+                      <span className="text-xs text-gray-600">Team</span>
                     </div>
-                    <div className="flex -space-x-2">
-                      {grant.assignees.slice(0, 3).map((assignee, index) => (
+                    <div className="flex -space-x-1">
+                      {grant.assignees.slice(0, 2).map((assignee, index) => (
                         <div
                           key={index}
-                          className="w-8 h-8 bg-[#4C956C] rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-medium shadow-sm"
+                          className="w-5 h-5 bg-[#4C956C] rounded-full border border-white flex items-center justify-center text-white text-xs font-medium"
                           title={assignee}
                         >
-                          {assignee}
+                          {assignee.charAt(0)}
                         </div>
                       ))}
-                      {grant.assignees.length > 3 && (
-                        <div className="w-8 h-8 bg-gray-400 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-medium shadow-sm">
-                          +{grant.assignees.length - 3}
+                      {grant.assignees.length > 2 && (
+                        <div className="w-5 h-5 bg-gray-400 rounded-full border border-white flex items-center justify-center text-white text-xs font-medium">
+                          +{grant.assignees.length - 2}
                         </div>
                       )}
                     </div>
@@ -204,12 +289,12 @@ export const GrantPipelineKanban = () => {
 
               {/* Empty State */}
               {getGrantsForColumn(column.id).length === 0 && (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-white border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Plus className="w-8 h-8 text-gray-400" />
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 bg-white border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Plus className="w-6 h-6 text-gray-400" />
                   </div>
-                  <p className="text-gray-500 font-medium">No grants yet</p>
-                  <p className="text-sm text-gray-400 mt-1">Drag grants here or add new ones</p>
+                  <p className="text-gray-500 text-sm font-medium">No grants yet</p>
+                  <p className="text-xs text-gray-400 mt-1">Drag grants here</p>
                 </div>
               )}
             </div>
