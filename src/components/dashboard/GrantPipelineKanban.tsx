@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { MoreHorizontal, Plus, Calendar, DollarSign, Filter, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const columns = [
   { id: 'ideas', title: 'Ideas & Leads', count: 3, color: 'bg-slate-50 border-slate-200', headerColor: 'bg-slate-100' },
@@ -87,10 +87,69 @@ const sampleGrants = [
 export const GrantPipelineKanban = () => {
   const [grants, setGrants] = useState(sampleGrants);
   const [visibleColumns, setVisibleColumns] = useState(0);
+  const [draggedGrant, setDraggedGrant] = useState<number | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const columnsPerView = 3;
+  const { toast } = useToast();
 
   const getGrantsForColumn = (columnId: string) => {
     return grants.filter(grant => grant.status === columnId);
+  };
+
+  const handleDragStart = (e: React.DragEvent, grantId: number) => {
+    setDraggedGrant(grantId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnd = () => {
+    setDraggedGrant(null);
+    setDragOverColumn(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (columnId: string) => {
+    setDragOverColumn(columnId);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+      setDragOverColumn(null);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault();
+    
+    if (draggedGrant === null) return;
+
+    const grant = grants.find(g => g.id === draggedGrant);
+    if (!grant) return;
+
+    const oldStatus = grant.status;
+    if (oldStatus === targetColumnId) return;
+
+    setGrants(prev => prev.map(g => 
+      g.id === draggedGrant 
+        ? { ...g, status: targetColumnId }
+        : g
+    ));
+
+    const columnName = columns.find(col => col.id === targetColumnId)?.title || targetColumnId;
+    toast({
+      title: "Grant moved",
+      description: `"${grant.title}" moved to ${columnName}`,
+    });
+
+    setDraggedGrant(null);
+    setDragOverColumn(null);
   };
 
   const getDaysUntilDeadline = (deadline: string) => {
@@ -199,7 +258,14 @@ export const GrantPipelineKanban = () => {
       {/* Kanban Board */}
       <div className="grid grid-cols-3 gap-4 h-[500px]">
         {visibleColumnsData.map((column) => (
-          <div key={column.id} className="flex flex-col">
+          <div 
+            key={column.id} 
+            className="flex flex-col"
+            onDragOver={handleDragOver}
+            onDragEnter={() => handleDragEnter(column.id)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, column.id)}
+          >
             {/* Column Header */}
             <div className={`p-3 rounded-t-lg border-b-2 ${column.headerColor} border-gray-200`}>
               <div className="flex items-center justify-between mb-1">
@@ -214,12 +280,18 @@ export const GrantPipelineKanban = () => {
             </div>
 
             {/* Column Content */}
-            <div className={`flex-1 rounded-b-lg border-l border-r border-b ${column.color} p-3 space-y-2 overflow-y-auto`}>
+            <div className={`flex-1 rounded-b-lg border-l border-r border-b ${column.color} p-3 space-y-2 overflow-y-auto transition-all duration-200 ${
+              dragOverColumn === column.id ? 'bg-opacity-80 ring-2 ring-[#2C6E49] ring-opacity-50' : ''
+            }`}>
               {getGrantsForColumn(column.id).map((grant) => (
                 <div
                   key={grant.id}
-                  className="bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-all duration-200 group"
+                  className={`bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-all duration-200 group ${
+                    draggedGrant === grant.id ? 'opacity-50 transform rotate-2 scale-105' : ''
+                  }`}
                   draggable
+                  onDragStart={(e) => handleDragStart(e, grant.id)}
+                  onDragEnd={handleDragEnd}
                 >
                   {/* Grant Header */}
                   <div className="flex items-start justify-between mb-2">
