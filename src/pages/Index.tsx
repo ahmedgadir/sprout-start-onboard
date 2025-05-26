@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -54,7 +53,7 @@ const Index = () => {
   const [programData, setProgramData] = useState([]);
 
   // Calculate password strength
-  const evaluatePasswordStrength = (password: string) => {
+  const evaluatePasswordStrength = (password: string): string => {
     if (!password) return '';
     
     let score = 0;
@@ -89,7 +88,7 @@ const Index = () => {
         progressValue = valid ? 20 : Math.max(5, (isEmailValid ? 10 : 0) + (isPasswordValid ? 5 : 0));
         break;
       case 1:
-        valid = formData.legalName && formData.taxStatus && formData.city && formData.staffSize;
+        valid = Boolean(formData.legalName && formData.taxStatus && formData.city && formData.staffSize);
         progressValue = 40;
         break;
       case 2:
