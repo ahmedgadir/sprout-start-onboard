@@ -201,9 +201,9 @@ export const GrantPipelineKanban = () => {
   };
 
   return (
-    <Card className="p-6 h-full bg-white shadow-sm">
+    <Card className="p-6 h-full bg-white shadow-sm flex flex-col">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-gray-900">Grant Pipeline</h2>
           <p className="text-gray-600">
@@ -222,8 +222,8 @@ export const GrantPipelineKanban = () => {
         </div>
       </div>
 
-      {/* Vertical Stage Layout */}
-      <div className="space-y-3 h-[600px] overflow-y-auto">
+      {/* Vertical Stage Layout - takes up remaining height */}
+      <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
         {stages.map((stage) => {
           const stageGrants = getGrantsForStage(stage.id);
           const isExpanded = expandedStages.has(stage.id);
