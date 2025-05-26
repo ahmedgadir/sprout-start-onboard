@@ -49,7 +49,7 @@ const GrantDiscovery = () => {
         
         <div className="h-[calc(100vh-56px)]">
           <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={selectedGrantId ? 68 : 100} minSize={50}>
+            <ResizablePanel defaultSize={selectedGrantId ? 55 : 100} minSize={50}>
               <GrantList 
                 onGrantSelect={handleGrantSelect}
                 selectedGrantId={selectedGrantId}
@@ -59,7 +59,7 @@ const GrantDiscovery = () => {
             {selectedGrantId && (
               <>
                 <ResizableHandle />
-                <ResizablePanel defaultSize={32} minSize={25} maxSize={50}>
+                <ResizablePanel defaultSize={45} minSize={25} maxSize={50}>
                   <GrantPreviewDrawer 
                     grantId={selectedGrantId}
                     onClose={handleCloseDrawer}
