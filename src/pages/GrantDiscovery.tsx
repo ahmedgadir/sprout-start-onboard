@@ -48,8 +48,15 @@ const GrantDiscovery = () => {
         <TopBar onSearchOpen={() => setSearchOpen(true)} />
         
         <div className="h-[calc(100vh-56px)]">
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={selectedGrantId ? 55 : 100} minSize={50}>
+          <ResizablePanelGroup 
+            direction="horizontal" 
+            key={selectedGrantId ? 'split' : 'single'}
+          >
+            <ResizablePanel 
+              defaultSize={selectedGrantId ? 55 : 100} 
+              minSize={50}
+              id="grant-list-panel"
+            >
               <GrantList 
                 onGrantSelect={handleGrantSelect}
                 selectedGrantId={selectedGrantId}
@@ -58,8 +65,13 @@ const GrantDiscovery = () => {
             
             {selectedGrantId && (
               <>
-                <ResizableHandle />
-                <ResizablePanel defaultSize={45} minSize={25} maxSize={50}>
+                <ResizableHandle withHandle />
+                <ResizablePanel 
+                  defaultSize={45} 
+                  minSize={25} 
+                  maxSize={50}
+                  id="grant-preview-panel"
+                >
                   <GrantPreviewDrawer 
                     grantId={selectedGrantId}
                     onClose={handleCloseDrawer}
