@@ -7,7 +7,6 @@ import { GrantPipelineKanban } from '@/components/dashboard/GrantPipelineKanban'
 import { CalendarWidget } from '@/components/dashboard/CalendarWidget';
 import { TeamActivityFeed } from '@/components/dashboard/TeamActivityFeed';
 import { AIInsightBanner } from '@/components/dashboard/AIInsightBanner';
-import { NewGrantsWidget } from '@/components/dashboard/NewGrantsWidget';
 
 const Dashboard = () => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -40,9 +39,6 @@ const Dashboard = () => {
             <div className="space-y-6">
               {/* AI Insight Banner at the top */}
               <AIInsightBanner />
-              
-              {/* New Grants Widget */}
-              <NewGrantsWidget />
               
               {/* Calendar/Timeline Widget */}
               <CalendarWidget />

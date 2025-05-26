@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Plus, Calendar, DollarSign, Filter, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { MoreHorizontal, Plus, Calendar, DollarSign, Filter, Users, ChevronDown, ChevronUp, Sparkles, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 const stages = [
   { id: 'ideas', title: 'Ideas & Leads', color: 'bg-slate-50 border-slate-200', headerColor: 'bg-slate-100' },
@@ -84,12 +84,41 @@ const sampleGrants = [
   },
 ];
 
+interface NewGrant {
+  id: string;
+  title: string;
+  funder: string;
+  fitScore: number;
+  awardRange: string;
+  deadline: Date;
+}
+
+const newGrants: NewGrant[] = [
+  {
+    id: '1',
+    title: 'Community Food Security Initiative',
+    funder: 'Buffalo Foundation',
+    fitScore: 94,
+    awardRange: '$25k–$50k',
+    deadline: new Date('2024-07-15')
+  },
+  {
+    id: '2', 
+    title: 'Youth Development Programs',
+    funder: 'Gates Foundation',
+    fitScore: 87,
+    awardRange: '$100k–$250k',
+    deadline: new Date('2024-06-30')
+  }
+];
+
 export const GrantPipelineKanban = () => {
   const [grants, setGrants] = useState(sampleGrants);
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(['researching', 'drafting']));
   const [draggedGrant, setDraggedGrant] = useState<number | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const { toast } = useToast();
+  const lastPulledDate = new Date('2024-05-26');
 
   const getGrantsForStage = (stageId: string) => {
     return grants.filter(grant => grant.status === stageId);
@@ -219,6 +248,77 @@ export const GrantPipelineKanban = () => {
             <Plus className="w-4 h-4 mr-2" />
             Add New Grant
           </Button>
+        </div>
+      </div>
+
+      {/* New Grants Section */}
+      <div className="mb-6 flex-shrink-0">
+        <div className="border rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+          <div className="p-4 border-b border-green-200 bg-green-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="w-5 h-5 text-[#2C6E49]" />
+                  <h3 className="text-lg font-semibold text-gray-900">New Grants</h3>
+                  <Badge className="bg-green-100 text-green-800 border-green-300">
+                    {newGrants.length} new
+                  </Badge>
+                </div>
+                <span className="text-sm text-gray-600">
+                  Last updated: {lastPulledDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
+              </div>
+              <Link to="/discovery">
+                <Button variant="outline" size="sm" className="text-[#2C6E49] border-[#2C6E49] hover:bg-[#2C6E49] hover:text-white">
+                  View All Grants
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+          
+          <div className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {newGrants.map((grant) => (
+                <Link 
+                  key={grant.id}
+                  to={`/discovery?grantId=${grant.id}`}
+                  className="block"
+                >
+                  <div className="p-3 bg-white border border-green-200 rounded-lg hover:border-[#2C6E49] hover:shadow-md transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-medium text-gray-900 text-sm leading-tight line-clamp-2 flex-1">
+                        {grant.title}
+                      </h4>
+                      <div className="flex items-center space-x-1 ml-2">
+                        <div className="w-8 h-8 bg-[#2C6E49] rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {grant.fitScore}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <p className="text-xs text-gray-600 mb-2">{grant.funder}</p>
+                    
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="text-xs border-green-300 text-green-700">
+                        {grant.awardRange}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
+                        {Math.ceil((grant.deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}d
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
