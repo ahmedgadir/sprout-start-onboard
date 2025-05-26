@@ -14,6 +14,7 @@ interface Grant {
   awardRange: string;
   deadline: Date;
   tooltipReason: string;
+  isNew?: boolean;
 }
 
 interface GrantListProps {
@@ -33,7 +34,8 @@ const mockGrants: Grant[] = [
     hintChip: 'Geo & Programs match',
     awardRange: '$25k–$50k',
     deadline: new Date('2024-07-15'),
-    tooltipReason: 'Top reason: HQ in Buffalo, NY falls within eligible region.'
+    tooltipReason: 'Top reason: HQ in Buffalo, NY falls within eligible region.',
+    isNew: true
   },
   {
     id: '2',
@@ -46,7 +48,8 @@ const mockGrants: Grant[] = [
     hintChip: 'Youth focus',
     awardRange: '$100k–$250k',
     deadline: new Date('2024-06-30'),
-    tooltipReason: 'Top reason: Your youth programs align with funder priorities.'
+    tooltipReason: 'Top reason: Your youth programs align with funder priorities.',
+    isNew: true
   },
   {
     id: '3',
@@ -90,13 +93,31 @@ const mockGrants: Grant[] = [
 ];
 
 export const GrantList = ({ onGrantSelect, selectedGrantId }: GrantListProps) => {
+  const newGrantsCount = mockGrants.filter(grant => grant.isNew).length;
+  const lastPulledDate = new Date('2024-05-26');
+
   return (
     <div className="h-full bg-white border-r border-gray-200">
       <div className="p-6 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-gray-900">Grant Discovery</h1>
-        <p className="text-gray-600 mt-1">
-          {mockGrants.length} grants found matching your criteria
-        </p>
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-gray-600">
+            {mockGrants.length} grants found matching your criteria
+            {newGrantsCount > 0 && (
+              <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                {newGrantsCount} new
+              </span>
+            )}
+          </p>
+          <p className="text-sm text-gray-500">
+            Last updated: {lastPulledDate.toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+        </div>
       </div>
       
       <div className="p-4 space-y-4 h-[calc(100%-120px)] overflow-y-auto">
