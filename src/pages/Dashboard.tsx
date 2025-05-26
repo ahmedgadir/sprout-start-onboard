@@ -22,19 +22,19 @@ const Dashboard = () => {
         <TopBar onSearchOpen={() => setSearchOpen(true)} />
         
         {/* Dashboard Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-8 space-y-8">
           {/* Summary Tiles */}
           <SummaryTiles />
           
           {/* Main Content Grid */}
-          <div className="grid grid-cols-12 gap-6">
-            {/* Grant Pipeline Kanban - 60% width */}
-            <div className="col-span-7">
+          <div className="grid grid-cols-12 gap-8">
+            {/* Grant Pipeline Kanban - 65% width */}
+            <div className="col-span-8">
               <GrantPipelineKanban />
             </div>
             
-            {/* Right Column - 35% width */}
-            <div className="col-span-5 space-y-6">
+            {/* Right Column - 30% width */}
+            <div className="col-span-4 space-y-6">
               {/* Calendar/Timeline Widget */}
               <CalendarWidget />
               

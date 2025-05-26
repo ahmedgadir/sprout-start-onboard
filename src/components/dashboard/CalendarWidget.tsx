@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Calendar, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const events = [
@@ -13,13 +13,31 @@ const events = [
 ];
 
 const upcomingItems = [
-  { title: 'Youth Education Initiative Proposal', type: 'Proposal Due', date: 'Jun 15', urgent: true },
-  { title: 'Community Health Progress Report', type: 'Report Due', date: 'Jun 18', urgent: false },
-  { title: 'Environmental Grant Letter of Intent', type: 'LOI Due', date: 'Jun 22', urgent: false },
+  { 
+    title: 'Youth Education Initiative Proposal', 
+    type: 'Proposal Due', 
+    date: 'Jun 15', 
+    urgent: true,
+    daysLeft: 2
+  },
+  { 
+    title: 'Community Health Progress Report', 
+    type: 'Report Due', 
+    date: 'Jun 18', 
+    urgent: false,
+    daysLeft: 5
+  },
+  { 
+    title: 'Environmental Grant Letter of Intent', 
+    type: 'LOI Due', 
+    date: 'Jun 22', 
+    urgent: false,
+    daysLeft: 9
+  },
 ];
 
 export const CalendarWidget = () => {
-  const [activeTab, setActiveTab] = useState<'calendar' | 'timeline'>('calendar');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'timeline'>('timeline');
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const getDaysInMonth = (date: Date) => {
@@ -45,7 +63,7 @@ export const CalendarWidget = () => {
       const dayEvents = events.filter(event => event.date === day);
       days.push(
         <div key={day} className="h-8 relative">
-          <button className="w-full h-full text-sm hover:bg-gray-100 rounded flex items-center justify-center relative">
+          <button className="w-full h-full text-sm hover:bg-gray-100 rounded flex items-center justify-center relative transition-colors">
             {day}
             {dayEvents.length > 0 && (
               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-1">
@@ -73,35 +91,79 @@ export const CalendarWidget = () => {
 
   return (
     <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-900">Calendar & Timeline</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-gray-900">Calendar & Timeline</h3>
         <div className="flex bg-gray-100 rounded-lg p-1">
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={cn(
-              "px-3 py-1 text-sm rounded transition-colors",
-              activeTab === 'calendar'
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            )}
-          >
-            Calendar
-          </button>
           <button
             onClick={() => setActiveTab('timeline')}
             className={cn(
-              "px-3 py-1 text-sm rounded transition-colors",
+              "px-3 py-1.5 text-sm rounded transition-colors",
               activeTab === 'timeline'
-                ? "bg-white text-gray-900 shadow-sm"
+                ? "bg-white text-gray-900 shadow-sm font-medium"
                 : "text-gray-600 hover:text-gray-900"
             )}
           >
             Timeline
           </button>
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={cn(
+              "px-3 py-1.5 text-sm rounded transition-colors",
+              activeTab === 'calendar'
+                ? "bg-white text-gray-900 shadow-sm font-medium"
+                : "text-gray-600 hover:text-gray-900"
+            )}
+          >
+            Calendar
+          </button>
         </div>
       </div>
 
-      {activeTab === 'calendar' ? (
+      {activeTab === 'timeline' ? (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2 mb-4">
+            <Clock className="w-5 h-5 text-gray-500" />
+            <h4 className="font-medium text-gray-900">Upcoming & Overdue</h4>
+          </div>
+          
+          {upcomingItems.map((item, index) => (
+            <div
+              key={index}
+              className={cn(
+                "p-4 rounded-lg border transition-all duration-200 cursor-pointer hover:shadow-md",
+                item.urgent 
+                  ? "border-red-200 bg-red-50 hover:bg-red-100" 
+                  : "border-gray-200 bg-white hover:bg-gray-50"
+              )}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    {item.urgent && <AlertCircle className="w-4 h-4 text-red-500" />}
+                    <h5 className="font-medium text-sm text-gray-900">{item.title}</h5>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-2">{item.type}</p>
+                  <div className="flex items-center justify-between">
+                    <span className={cn(
+                      "text-sm font-medium",
+                      item.urgent ? "text-red-600" : "text-gray-600"
+                    )}>
+                      {item.date}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {item.daysLeft} days left
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          <Button variant="outline" className="w-full mt-4">
+            View All Deadlines
+          </Button>
+        </div>
+      ) : (
         <div>
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-4">
@@ -139,37 +201,6 @@ export const CalendarWidget = () => {
           <div className="grid grid-cols-7 gap-1">
             {renderCalendar()}
           </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <h4 className="font-medium text-gray-900 flex items-center">
-            <Clock className="w-4 h-4 mr-2" />
-            Upcoming & Overdue
-          </h4>
-          {upcomingItems.map((item, index) => (
-            <div
-              key={index}
-              className={cn(
-                "p-3 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors",
-                item.urgent ? "border-red-200 bg-red-50" : "border-gray-200"
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h5 className="font-medium text-sm text-gray-900">{item.title}</h5>
-                  <p className="text-xs text-gray-600">{item.type}</p>
-                </div>
-                <div className="text-right">
-                  <p className={cn(
-                    "text-sm font-medium",
-                    item.urgent ? "text-red-600" : "text-gray-600"
-                  )}>
-                    {item.date}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       )}
     </Card>

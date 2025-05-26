@@ -10,6 +10,8 @@ const tiles = [
     icon: TrendingUp,
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
+    change: '+2 this week',
+    changeColor: 'text-green-600',
   },
   {
     title: 'Deadlines ≤ 14 days',
@@ -18,6 +20,8 @@ const tiles = [
     color: 'text-red-600',
     bgColor: 'bg-red-50',
     hasAlert: true,
+    change: '2 urgent',
+    changeColor: 'text-red-600',
   },
   {
     title: 'Funding in Pipeline',
@@ -26,6 +30,8 @@ const tiles = [
     color: 'text-green-600',
     bgColor: 'bg-green-50',
     isCurrency: true,
+    change: '+$125K this month',
+    changeColor: 'text-green-600',
   },
   {
     title: 'Reports Due',
@@ -33,6 +39,8 @@ const tiles = [
     icon: FileText,
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
+    change: 'This month',
+    changeColor: 'text-gray-600',
   },
 ];
 
@@ -82,27 +90,32 @@ export const SummaryTiles = () => {
         return (
           <Card
             key={tile.title}
-            className="p-6 cursor-pointer hover:shadow-md transition-shadow"
+            className="p-6 cursor-pointer hover:shadow-lg transition-all duration-200 border-0 shadow-sm"
             onClick={() => {
               // Filter Kanban to relevant cards
               console.log(`Filtering by ${tile.title}`);
             }}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  {tile.title}
-                </p>
-                <div className="flex items-center space-x-2">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {formatValue(animatedValues[index], tile.isCurrency || false)}
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <p className="text-sm font-medium text-gray-600">
+                    {tile.title}
                   </p>
                   {tile.hasAlert && tile.value > 0 && (
-                    <Flame className="w-5 h-5 text-red-500" />
+                    <Flame className="w-4 h-4 text-red-500" />
                   )}
                 </div>
+                <div className="space-y-1">
+                  <p className="text-3xl font-bold text-gray-900">
+                    {formatValue(animatedValues[index], tile.isCurrency || false)}
+                  </p>
+                  <p className={`text-xs font-medium ${tile.changeColor}`}>
+                    {tile.change}
+                  </p>
+                </div>
               </div>
-              <div className={`p-3 rounded-lg ${tile.bgColor}`}>
+              <div className={`p-3 rounded-xl ${tile.bgColor}`}>
                 <Icon className={`w-6 h-6 ${tile.color}`} />
               </div>
             </div>

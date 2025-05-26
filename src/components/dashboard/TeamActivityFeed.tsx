@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Upload, ArrowRight, AtSign, Heart, Smile } from 'lucide-react';
+import { MessageCircle, Upload, ArrowRight, AtSign, Heart, Smile, Send } from 'lucide-react';
 
 const activities = [
   {
@@ -52,6 +52,7 @@ const filterOptions = ['All', 'Mentions', 'My items'];
 export const TeamActivityFeed = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [replyText, setReplyText] = useState('');
+  const [showReplyFor, setShowReplyFor] = useState<number | null>(null);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -74,10 +75,18 @@ export const TeamActivityFeed = () => {
     return true;
   });
 
+  const handleReply = (activityId: number) => {
+    if (replyText.trim()) {
+      console.log(`Reply to activity ${activityId}:`, replyText);
+      setReplyText('');
+      setShowReplyFor(null);
+    }
+  };
+
   return (
     <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-900">Team Activity</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-gray-900">Team Activity</h3>
         <div className="flex space-x-1">
           {filterOptions.map(filter => (
             <Button
@@ -97,17 +106,19 @@ export const TeamActivityFeed = () => {
         {filteredActivities.map((activity) => (
           <div
             key={activity.id}
-            className={`p-3 rounded-lg border transition-colors ${
-              activity.isMention ? 'border-orange-200 bg-orange-50' : 'border-gray-100 hover:bg-gray-50'
+            className={`p-4 rounded-lg border transition-all duration-200 ${
+              activity.isMention 
+                ? 'border-orange-200 bg-orange-50' 
+                : 'border-gray-100 hover:bg-gray-50'
             }`}
           >
             <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-[#4C956C] rounded-full flex items-center justify-center text-white text-xs font-medium">
+              <div className="w-9 h-9 bg-gradient-to-br from-[#2C6E49] to-[#4C956C] rounded-full flex items-center justify-center text-white text-xs font-medium">
                 {activity.user.split(' ').map(n => n[0]).join('')}
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-2 mb-1">
+                <div className="flex items-center space-x-2 mb-2">
                   {getIcon(activity.type)}
                   <p className="text-sm text-gray-900">
                     <span className="font-medium">{activity.user}</span>
@@ -119,34 +130,47 @@ export const TeamActivityFeed = () => {
                 </div>
                 
                 {activity.details && (
-                  <p className="text-sm text-gray-600 mb-2">{activity.details}</p>
+                  <p className="text-sm text-gray-600 mb-3 bg-white p-2 rounded border-l-2 border-gray-200">
+                    {activity.details}
+                  </p>
                 )}
                 
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500">{activity.time}</p>
                   
                   <div className="flex items-center space-x-2">
-                    <button className="p-1 hover:bg-gray-200 rounded">
-                      <Heart className="w-3 h-3 text-gray-400" />
+                    <button className="p-1.5 hover:bg-gray-200 rounded transition-colors">
+                      <Heart className="w-3.5 h-3.5 text-gray-400" />
                     </button>
-                    <button className="p-1 hover:bg-gray-200 rounded">
-                      <Smile className="w-3 h-3 text-gray-400" />
+                    <button className="p-1.5 hover:bg-gray-200 rounded transition-colors">
+                      <Smile className="w-3.5 h-3.5 text-gray-400" />
                     </button>
-                    <button className="p-1 hover:bg-gray-200 rounded">
-                      <MessageCircle className="w-3 h-3 text-gray-400" />
+                    <button 
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      onClick={() => setShowReplyFor(showReplyFor === activity.id ? null : activity.id)}
+                    >
+                      <MessageCircle className="w-3.5 h-3.5 text-gray-400" />
                     </button>
                   </div>
                 </div>
                 
-                {activity.type === 'comment' && (
-                  <div className="mt-3 pl-4 border-l-2 border-gray-200">
+                {showReplyFor === activity.id && (
+                  <div className="mt-3 flex space-x-2">
                     <Input
                       type="text"
-                      placeholder="Reply..."
+                      placeholder="Write a reply..."
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
-                      className="text-sm h-8"
+                      className="text-sm h-9 flex-1"
+                      onKeyPress={(e) => e.key === 'Enter' && handleReply(activity.id)}
                     />
+                    <Button 
+                      size="sm" 
+                      onClick={() => handleReply(activity.id)}
+                      className="bg-[#2C6E49] hover:bg-[#1B4332] h-9"
+                    >
+                      <Send className="w-3 h-3" />
+                    </Button>
                   </div>
                 )}
               </div>
@@ -154,6 +178,10 @@ export const TeamActivityFeed = () => {
           </div>
         ))}
       </div>
+      
+      <Button variant="outline" className="w-full mt-4">
+        View All Activity
+      </Button>
     </Card>
   );
 };
