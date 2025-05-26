@@ -7,7 +7,8 @@ import {
   TrendingUp, 
   FolderOpen, 
   Settings,
-  Target
+  Target,
+  PenTool
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -15,6 +16,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Discover', path: '/discovery' },
+  { icon: PenTool, label: 'Write Grants', path: '/writing/demo' },
   { icon: FileText, label: 'Drafts & Proposals', path: '/proposals' },
   { icon: TrendingUp, label: 'Progress Reports', path: '/reports' },
   { icon: FolderOpen, label: 'Documents', path: '/documents' },
@@ -35,7 +37,8 @@ export const Sidebar = () => {
       <nav className="flex-1 flex flex-col space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.path;
+          const isActive = location.pathname === item.path || 
+            (item.path === '/writing/demo' && location.pathname.startsWith('/writing/'));
           
           return (
             <Link
