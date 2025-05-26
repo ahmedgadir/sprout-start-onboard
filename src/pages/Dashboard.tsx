@@ -21,25 +21,27 @@ const Dashboard = () => {
         {/* Top Bar */}
         <TopBar onSearchOpen={() => setSearchOpen(true)} />
         
-        {/* Dashboard Content */}
-        <div className="p-8 space-y-8">
-          {/* Summary Tiles */}
-          <SummaryTiles />
+        {/* Dashboard Content with improved spacing */}
+        <div className="p-6 space-y-6 max-w-7xl mx-auto">
+          {/* Summary Tiles - now with better spacing */}
+          <div className="mb-8">
+            <SummaryTiles />
+          </div>
           
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-12 gap-8">
-            {/* Grant Pipeline Kanban - 65% width */}
-            <div className="col-span-8">
+          {/* Main Content Grid - redesigned for better proportions */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[800px]">
+            {/* Grant Pipeline Kanban - Takes up 2/3 of the width on large screens */}
+            <div className="lg:col-span-2">
               <GrantPipelineKanban />
             </div>
             
-            {/* Right Column - 30% width */}
-            <div className="col-span-4 space-y-6">
+            {/* Right Sidebar - Takes up 1/3 with better internal spacing */}
+            <div className="space-y-6">
+              {/* AI Insight Banner at the top */}
+              <AIInsightBanner />
+              
               {/* Calendar/Timeline Widget */}
               <CalendarWidget />
-              
-              {/* AI Insight Banner */}
-              <AIInsightBanner />
               
               {/* Team Activity Feed */}
               <TeamActivityFeed />

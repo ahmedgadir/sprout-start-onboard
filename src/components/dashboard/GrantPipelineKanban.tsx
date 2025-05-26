@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Plus, Calendar, DollarSign } from 'lucide-react';
+import { MoreHorizontal, Plus, Calendar, DollarSign, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const columns = [
@@ -77,17 +77,23 @@ export const GrantPipelineKanban = () => {
           <h2 className="text-2xl font-semibold text-gray-900">Grant Pipeline</h2>
           <p className="text-gray-600 mt-1">{grants.length} active grants in pipeline</p>
         </div>
-        <Button size="sm" className="bg-[#2C6E49] hover:bg-[#1B4332]">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Grant
-        </Button>
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" size="sm">
+            <Filter className="w-4 h-4 mr-2" />
+            Filter
+          </Button>
+          <Button size="sm" className="bg-[#2C6E49] hover:bg-[#1B4332]">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Grant
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-6 gap-4 h-[700px]">
+      <div className="grid grid-cols-6 gap-4 h-[650px]">
         {columns.map((column) => (
           <div key={column.id} className="flex flex-col">
             {/* Column Header */}
-            <div className={`p-3 rounded-lg ${column.color} mb-4`}>
+            <div className={`p-4 rounded-lg ${column.color} mb-4`}>
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-gray-900 text-sm">{column.title}</h3>
                 <span className="bg-white text-gray-700 text-xs font-medium px-2 py-1 rounded-full">
@@ -97,7 +103,7 @@ export const GrantPipelineKanban = () => {
             </div>
 
             {/* Grant Cards */}
-            <div className="flex-1 space-y-4 overflow-y-auto">
+            <div className="flex-1 space-y-3 overflow-y-auto">
               {getGrantsForColumn(column.id).map((grant) => (
                 <div
                   key={grant.id}

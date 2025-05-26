@@ -47,18 +47,18 @@ export const AIInsightBanner = () => {
   const Icon = insight.icon;
 
   return (
-    <Card className={`p-4 ${insight.bgColor} ${insight.borderColor} border`}>
+    <Card className={`p-5 ${insight.bgColor} ${insight.borderColor} border`}>
       <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-3 flex-1">
-          <div className={`p-2 rounded-lg bg-white shadow-sm`}>
+        <div className="flex items-start space-x-4 flex-1">
+          <div className={`p-3 rounded-lg bg-white shadow-sm`}>
             <Icon className={`w-5 h-5 ${insight.color}`} />
           </div>
           
           <div className="flex-1">
-            <h4 className="font-medium text-gray-900 mb-1">{insight.title}</h4>
-            <p className="text-sm text-gray-600 mb-3">{insight.description}</p>
+            <h4 className="font-semibold text-gray-900 mb-2">{insight.title}</h4>
+            <p className="text-sm text-gray-600 mb-4">{insight.description}</p>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <Button size="sm" className="bg-[#2C6E49] hover:bg-[#1B4332] text-white">
                 {insight.action}
               </Button>
