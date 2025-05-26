@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Plus, Calendar, DollarSign, Filter, Users, ChevronDown, ChevronUp, Sparkles, ArrowRight } from 'lucide-react';
+import { MoreHorizontal, Plus, Calendar, DollarSign, Filter, Users, ChevronDown, ChevronUp, Sparkles, ArrowRight, X, Star, Eye, Square } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 
@@ -117,6 +117,8 @@ export const GrantPipelineKanban = () => {
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(['researching', 'drafting']));
   const [draggedGrant, setDraggedGrant] = useState<number | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+  const [selectedGrant, setSelectedGrant] = useState<typeof sampleGrants[0] | null>(null);
+  const [activeTab, setActiveTab] = useState('overview');
   const { toast } = useToast();
   const lastPulledDate = new Date('2024-05-26');
 
@@ -229,6 +231,35 @@ export const GrantPipelineKanban = () => {
     }
   };
 
+  const handleGrantClick = (grant: typeof sampleGrants[0]) => {
+    setSelectedGrant(grant);
+  };
+
+  const closePreview = () => {
+    setSelectedGrant(null);
+  };
+
+  const getMatchReasons = (grant: typeof sampleGrants[0]) => {
+    const reasons = [
+      { type: 'Geography', description: `Your programs operate in ${grant.funder} service area, an eligible region.` },
+      { type: 'Program alignment', description: `Your initiatives match the funder's focus areas and priorities.` },
+      { type: 'Org size', description: `Typical grantee budgets align with your organization's capacity.` }
+    ];
+    return reasons;
+  };
+
+  const getFitScore = (grant: typeof sampleGrants[0]) => {
+    // Generate fit score based on grant properties
+    if (grant.priority === 'high') return Math.floor(Math.random() * 10) + 90;
+    if (grant.priority === 'medium') return Math.floor(Math.random() * 15) + 75;
+    return Math.floor(Math.random() * 25) + 50;
+  };
+
+  const getHintChip = (grant: typeof sampleGrants[0]) => {
+    const hints = ['Geo & Programs match', 'Budget aligned', 'Youth focus', 'Community focus', 'Education aligned'];
+    return hints[grant.id % hints.length];
+  };
+
   return (
     <Card className="p-6 h-full bg-white shadow-sm flex flex-col">
       {/* Header Section */}
@@ -322,147 +353,351 @@ export const GrantPipelineKanban = () => {
         </div>
       </div>
 
-      {/* Vertical Stage Layout - takes up remaining height */}
-      <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
-        {stages.map((stage) => {
-          const stageGrants = getGrantsForStage(stage.id);
-          const isExpanded = expandedStages.has(stage.id);
-          
-          return (
-            <div 
-              key={stage.id}
-              className={`border rounded-lg transition-all duration-200 ${
-                dragOverStage === stage.id ? 'ring-2 ring-[#2C6E49] ring-opacity-50 bg-opacity-80' : ''
-              } ${stage.color}`}
-              onDragOver={handleDragOver}
-              onDragEnter={(e) => handleDragEnter(e, stage.id)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, stage.id)}
-            >
-              {/* Stage Header */}
-              <div 
-                className={`p-4 border-b cursor-pointer ${stage.headerColor} hover:bg-opacity-80 transition-colors`}
-                onClick={() => toggleStageExpansion(stage.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <h3 className="text-lg font-semibold text-gray-900">{stage.title}</h3>
-                    <span className="bg-white text-gray-700 text-sm font-medium px-3 py-1 rounded-full shadow-sm">
-                      {stageGrants.length}
-                    </span>
-                    <span className="text-sm text-gray-600 font-medium">
-                      ${stageGrants.reduce((sum, grant) => sum + grant.amount, 0).toLocaleString()}
-                    </span>
+      {/* Split View Layout when grant is selected */}
+      {selectedGrant ? (
+        <div className="flex-1 flex gap-6 min-h-0">
+          {/* Left Pane - Grant List */}
+          <div className="w-1/2 space-y-3 overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pipeline Grants</h3>
+            {stages.map((stage) => {
+              const stageGrants = getGrantsForStage(stage.id);
+              
+              return (
+                <div key={stage.id} className={`border rounded-lg ${stage.color}`}>
+                  <div className={`p-3 border-b ${stage.headerColor}`}>
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-gray-900">{stage.title}</h4>
+                      <span className="text-sm text-gray-600">{stageGrants.length}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" className="h-7 px-2">
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-600" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-600" />
-                    )}
+                  
+                  <div className="p-3 space-y-2">
+                    {stageGrants.map((grant) => (
+                      <div
+                        key={grant.id}
+                        onClick={() => handleGrantClick(grant)}
+                        className={`p-3 bg-white border rounded-lg cursor-pointer transition-all hover:shadow-md group ${
+                          selectedGrant?.id === grant.id ? 'border-[#2C6E49] bg-green-50' : 'border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-6 h-6 bg-gradient-to-br from-[#2C6E49] to-[#4C956C] rounded text-white text-xs flex items-center justify-center font-bold">
+                              {grant.funder.charAt(0)}
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="font-medium text-gray-900 text-sm">{grant.title}</h5>
+                              <p className="text-xs text-gray-600">{grant.funder}</p>
+                            </div>
+                          </div>
+                          <div className="w-8 h-8 bg-[#2C6E49] rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">
+                              {getFitScore(grant)}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline" className="text-xs">
+                            {getHintChip(grant)}
+                          </Badge>
+                          <div className="opacity-0 group-hover:opacity-100 flex items-center space-x-1">
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                              <Star className="w-3 h-3" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                              <Square className="w-3 h-3" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                              <Eye className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Right Pane - Preview Drawer */}
+          <div className="w-1/2 bg-white border border-gray-200 rounded-lg flex flex-col">
+            {/* Header */}
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#2C6E49] to-[#4C956C] rounded text-white text-sm flex items-center justify-center font-bold">
+                  {selectedGrant.funder.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{selectedGrant.title}</h3>
+                  <p className="text-sm text-gray-600">{selectedGrant.funder}</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={closePreview}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Fit Score Section */}
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full border-4 border-green-500 flex items-center justify-center">
+                    <span className="text-lg font-bold text-green-600">{getFitScore(selectedGrant)}%</span>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Fit Score</h4>
+                  <p className="text-sm text-green-600 font-medium">Excellent match</p>
                 </div>
               </div>
 
-              {/* Stage Content */}
-              {isExpanded && (
-                <div className="p-4">
-                  {stageGrants.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                      {stageGrants.map((grant) => (
-                        <div
-                          key={grant.id}
-                          className={`bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-all duration-200 group ${
-                            draggedGrant === grant.id ? 'opacity-50 transform scale-105 shadow-lg' : ''
-                          }`}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, grant.id)}
-                          onDragEnd={handleDragEnd}
-                        >
-                          {/* Grant Header */}
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <div className="w-6 h-6 bg-gradient-to-br from-[#2C6E49] to-[#4C956C] rounded text-white text-xs flex items-center justify-center font-bold">
-                                {grant.funder.charAt(0)}
-                              </div>
-                              <div className={`w-2 h-2 rounded-full ${getPriorityColor(grant.priority)}`} title={`${grant.priority} priority`}></div>
-                            </div>
-                            <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded">
-                              <MoreHorizontal className="w-3 h-3 text-gray-500" />
-                            </button>
-                          </div>
-
-                          {/* Grant Title & Funder */}
-                          <div className="mb-2">
-                            <h4 className="font-semibold text-gray-900 mb-1 text-sm leading-tight line-clamp-2">
-                              {grant.title}
-                            </h4>
-                            <p className="text-xs text-gray-600 font-medium">{grant.funder}</p>
-                          </div>
-
-                          {/* Amount */}
-                          <div className="flex items-center space-x-1 mb-2 p-2 bg-gray-50 rounded">
-                            <DollarSign className="w-3 h-3 text-green-600" />
-                            <span className="text-sm font-bold text-gray-900">
-                              ${grant.amount.toLocaleString()}
-                            </span>
-                          </div>
-
-                          {/* Deadline */}
-                          <div className="flex items-center space-x-1 mb-2">
-                            <Calendar className="w-3 h-3 text-gray-500" />
-                            <Badge
-                              variant="outline"
-                              className={`text-xs ${getDeadlineColor(grant.deadline)}`}
-                            >
-                              {getDaysUntilDeadline(grant.deadline)}d
-                            </Badge>
-                          </div>
-
-                          {/* Team */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-1">
-                              <Users className="w-3 h-3 text-gray-500" />
-                              <span className="text-xs text-gray-600">Team</span>
-                            </div>
-                            <div className="flex -space-x-1">
-                              {grant.assignees.slice(0, 2).map((assignee, index) => (
-                                <div
-                                  key={index}
-                                  className="w-5 h-5 bg-[#4C956C] rounded-full border border-white flex items-center justify-center text-white text-xs font-medium"
-                                  title={assignee}
-                                >
-                                  {assignee.charAt(0)}
-                                </div>
-                              ))}
-                              {grant.assignees.length > 2 && (
-                                <div className="w-5 h-5 bg-gray-400 rounded-full border border-white flex items-center justify-center text-white text-xs font-medium">
-                                  +{grant.assignees.length - 2}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+              <div className="space-y-2">
+                <h5 className="font-medium text-gray-900">Why this is a match</h5>
+                {getMatchReasons(selectedGrant).map((reason, index) => (
+                  <div key={index} className="flex items-start space-x-2">
+                    <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
                     </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="w-12 h-12 bg-white border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mx-auto mb-2">
-                        <Plus className="w-6 h-6 text-gray-400" />
+                    <div>
+                      <span className="font-medium text-gray-900">{reason.type}</span>
+                      <span className="text-gray-600"> — "{reason.description}"</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="border-b border-gray-200">
+              <div className="flex">
+                {['overview', 'requirements', 'funder', 'notes'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === tab
+                        ? 'border-[#2C6E49] text-[#2C6E49]'
+                        : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 p-4 overflow-y-auto">
+              {activeTab === 'overview' && (
+                <div className="space-y-4">
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-2">AI Synopsis</h5>
+                    <p className="text-sm text-gray-600">{selectedGrant.description}</p>
+                  </div>
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-2">Key Facts</h5>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Award Amount</span>
+                        <span className="text-sm font-medium">${selectedGrant.amount.toLocaleString()}</span>
                       </div>
-                      <p className="text-gray-500 text-sm font-medium">No grants in this stage</p>
-                      <p className="text-xs text-gray-400 mt-1">Drag grants here or click + to add</p>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Deadline</span>
+                        <span className="text-sm font-medium">{selectedGrant.deadline}</span>
+                      </div>
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
+              {activeTab === 'requirements' && (
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-2">Application Requirements</h5>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Project proposal (max 5 pages)</li>
+                    <li>• Budget and timeline</li>
+                    <li>• Organization overview</li>
+                    <li>• Letters of support</li>
+                  </ul>
+                </div>
+              )}
+              {activeTab === 'funder' && (
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-2">Funder Profile</h5>
+                  <p className="text-sm text-gray-600">
+                    {selectedGrant.funder} is a leading foundation focused on community development and social impact.
+                  </p>
+                </div>
+              )}
+              {activeTab === 'notes' && (
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-2">Notes</h5>
+                  <textarea 
+                    className="w-full h-32 p-2 border border-gray-200 rounded text-sm"
+                    placeholder="Add your notes here..."
+                  />
                 </div>
               )}
             </div>
-          );
-        })}
-      </div>
+
+            {/* Bottom Actions */}
+            <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+              <Button variant="outline" size="sm">
+                <Star className="w-4 h-4 mr-2" />
+                Save
+              </Button>
+              <Button variant="outline" size="sm">
+                <Square className="w-4 h-4 mr-2" />
+                Compare
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        // Original Vertical Stage Layout when no grant is selected
+        <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
+          {stages.map((stage) => {
+            const stageGrants = getGrantsForStage(stage.id);
+            const isExpanded = expandedStages.has(stage.id);
+            
+            return (
+              <div 
+                key={stage.id}
+                className={`border rounded-lg transition-all duration-200 ${
+                  dragOverStage === stage.id ? 'ring-2 ring-[#2C6E49] ring-opacity-50 bg-opacity-80' : ''
+                } ${stage.color}`}
+                onDragOver={handleDragOver}
+                onDragEnter={(e) => handleDragEnter(e, stage.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, stage.id)}
+              >
+                {/* Stage Header */}
+                <div 
+                  className={`p-4 border-b cursor-pointer ${stage.headerColor} hover:bg-opacity-80 transition-colors`}
+                  onClick={() => toggleStageExpansion(stage.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <h3 className="text-lg font-semibold text-gray-900">{stage.title}</h3>
+                      <span className="bg-white text-gray-700 text-sm font-medium px-3 py-1 rounded-full shadow-sm">
+                        {stageGrants.length}
+                      </span>
+                      <span className="text-sm text-gray-600 font-medium">
+                        ${stageGrants.reduce((sum, grant) => sum + grant.amount, 0).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="outline" size="sm" className="h-7 px-2">
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                      {isExpanded ? (
+                        <ChevronUp className="w-5 h-5 text-gray-600" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-600" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stage Content */}
+                {isExpanded && (
+                  <div className="p-4">
+                    {stageGrants.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                        {stageGrants.map((grant) => (
+                          <div
+                            key={grant.id}
+                            className={`bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-all duration-200 group ${
+                              draggedGrant === grant.id ? 'opacity-50 transform scale-105 shadow-lg' : ''
+                            }`}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, grant.id)}
+                            onDragEnd={handleDragEnd}
+                            onClick={() => handleGrantClick(grant)}
+                          >
+                            {/* Grant Header */}
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-6 h-6 bg-gradient-to-br from-[#2C6E49] to-[#4C956C] rounded text-white text-xs flex items-center justify-center font-bold">
+                                  {grant.funder.charAt(0)}
+                                </div>
+                                <div className={`w-2 h-2 rounded-full ${getPriorityColor(grant.priority)}`} title={`${grant.priority} priority`}></div>
+                              </div>
+                              <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded">
+                                <MoreHorizontal className="w-3 h-3 text-gray-500" />
+                              </button>
+                            </div>
+
+                            {/* Grant Title & Funder */}
+                            <div className="mb-2">
+                              <h4 className="font-semibold text-gray-900 mb-1 text-sm leading-tight line-clamp-2">
+                                {grant.title}
+                              </h4>
+                              <p className="text-xs text-gray-600 font-medium">{grant.funder}</p>
+                            </div>
+
+                            {/* Amount */}
+                            <div className="flex items-center space-x-1 mb-2 p-2 bg-gray-50 rounded">
+                              <DollarSign className="w-3 h-3 text-green-600" />
+                              <span className="text-sm font-bold text-gray-900">
+                                ${grant.amount.toLocaleString()}
+                              </span>
+                            </div>
+
+                            {/* Deadline */}
+                            <div className="flex items-center space-x-1 mb-2">
+                              <Calendar className="w-3 h-3 text-gray-500" />
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ${getDeadlineColor(grant.deadline)}`}
+                              >
+                                {getDaysUntilDeadline(grant.deadline)}d
+                              </Badge>
+                            </div>
+
+                            {/* Team */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-1">
+                                <Users className="w-3 h-3 text-gray-500" />
+                                <span className="text-xs text-gray-600">Team</span>
+                              </div>
+                              <div className="flex -space-x-1">
+                                {grant.assignees.slice(0, 2).map((assignee, index) => (
+                                  <div
+                                    key={index}
+                                    className="w-5 h-5 bg-[#4C956C] rounded-full border border-white flex items-center justify-center text-white text-xs font-medium"
+                                    title={assignee}
+                                  >
+                                    {assignee.charAt(0)}
+                                  </div>
+                                ))}
+                                {grant.assignees.length > 2 && (
+                                  <div className="w-5 h-5 bg-gray-400 rounded-full border border-white flex items-center justify-center text-white text-xs font-medium">
+                                    +{grant.assignees.length - 2}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="w-12 h-12 bg-white border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mx-auto mb-2">
+                          <Plus className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="text-gray-500 text-sm font-medium">No grants in this stage</p>
+                        <p className="text-xs text-gray-400 mt-1">Drag grants here or click + to add</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </Card>
   );
 };
