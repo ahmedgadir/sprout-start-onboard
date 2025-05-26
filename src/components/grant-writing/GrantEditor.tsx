@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { RichTextEditor } from '@/components/grant-writing/RichTextEditor';
 import { SentenceHighlighter } from '@/components/grant-writing/SentenceHighlighter';
+import { BudgetGrid } from '@/components/grant-writing/BudgetGrid';
+import { LogicModel } from '@/components/grant-writing/LogicModel';
 
 interface GrantEditorProps {
   currentSection: string;
@@ -39,6 +41,9 @@ export const GrantEditor = ({ currentSection, grantData }: GrantEditorProps) => 
     'budget-narrative': 400,
   };
 
+  // Check if current section needs structured format
+  const isStructuredSection = currentSection === 'budget-grid' || currentSection === 'logic-model';
+
   const handleGenerateDraft = async () => {
     setIsGenerating(true);
     // Simulate API call
@@ -60,6 +65,47 @@ export const GrantEditor = ({ currentSection, grantData }: GrantEditorProps) => 
     return 'Needs Review';
   };
 
+  const renderSectionContent = () => {
+    if (currentSection === 'budget-grid') {
+      return <BudgetGrid />;
+    }
+    
+    if (currentSection === 'logic-model') {
+      return <LogicModel />;
+    }
+
+    // For narrative sections
+    if (!content) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <Wand2 className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-lg font-medium mb-2">Ready to start writing?</h3>
+            <p className="mb-4">Generate a draft or start writing manually</p>
+            <Button onClick={handleGenerateDraft} disabled={isGenerating}>
+              <Wand2 className="w-4 h-4 mr-2" />
+              {isGenerating ? 'Generating...' : 'Generate Draft'}
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {editorMode === 'write' ? (
+          <RichTextEditor 
+            content={content}
+            onChange={setContent}
+            placeholder={`Start writing your ${sectionTitles[currentSection].toLowerCase()}...`}
+          />
+        ) : (
+          <SentenceHighlighter content={content} />
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="h-full bg-white flex flex-col">
       {/* Section Header */}
@@ -69,76 +115,56 @@ export const GrantEditor = ({ currentSection, grantData }: GrantEditorProps) => 
             {sectionTitles[currentSection]}
           </h2>
           <div className="flex items-center space-x-2">
-            {content && (
+            {!isStructuredSection && content && (
               <Badge className={getConfidenceColor(confidence)}>
                 {getConfidenceText(confidence)}
               </Badge>
             )}
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setEditorMode(editorMode === 'write' ? 'review' : 'write')}
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              {editorMode === 'write' ? 'Review Mode' : 'Edit Mode'}
-            </Button>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button 
-              onClick={handleGenerateDraft}
-              disabled={isGenerating}
-              size="sm"
-            >
-              <Wand2 className="w-4 h-4 mr-2" />
-              {isGenerating ? 'Generating...' : 'Generate Draft'}
-            </Button>
-            
-            {content && (
-              <Button variant="outline" size="sm">
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Regenerate
+            {!isStructuredSection && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setEditorMode(editorMode === 'write' ? 'review' : 'write')}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                {editorMode === 'write' ? 'Review Mode' : 'Edit Mode'}
               </Button>
             )}
           </div>
-          
-          {wordLimits[currentSection] && (
-            <div className="text-sm text-gray-500">
-              {content.split(' ').length} / {wordLimits[currentSection]} words
-            </div>
-          )}
         </div>
+        
+        {!isStructuredSection && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button 
+                onClick={handleGenerateDraft}
+                disabled={isGenerating}
+                size="sm"
+              >
+                <Wand2 className="w-4 h-4 mr-2" />
+                {isGenerating ? 'Generating...' : 'Generate Draft'}
+              </Button>
+              
+              {content && (
+                <Button variant="outline" size="sm">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Regenerate
+                </Button>
+              )}
+            </div>
+            
+            {wordLimits[currentSection] && (
+              <div className="text-sm text-gray-500">
+                {content.split(' ').length} / {wordLimits[currentSection]} words
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Editor Content */}
       <div className="flex-1 p-4 overflow-y-auto">
-        {!content ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <Wand2 className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <h3 className="text-lg font-medium mb-2">Ready to start writing?</h3>
-              <p className="mb-4">Generate a draft or start writing manually</p>
-              <Button onClick={handleGenerateDraft} disabled={isGenerating}>
-                <Wand2 className="w-4 h-4 mr-2" />
-                {isGenerating ? 'Generating...' : 'Generate Draft'}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {editorMode === 'write' ? (
-              <RichTextEditor 
-                content={content}
-                onChange={setContent}
-                placeholder={`Start writing your ${sectionTitles[currentSection].toLowerCase()}...`}
-              />
-            ) : (
-              <SentenceHighlighter content={content} />
-            )}
-          </div>
-        )}
+        {renderSectionContent()}
       </div>
 
       {/* Bottom Action Bar */}
