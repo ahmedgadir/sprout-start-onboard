@@ -1,7 +1,28 @@
 
 import React from 'react';
 
-export const OverviewTab = () => {
+interface Grant {
+  id: string;
+  title: string;
+  funder: string;
+  amount: string;
+  deadline: string;
+  location: string;
+  tags: string[];
+  description: string;
+  contact: string;
+  website: string;
+  eligibility: string;
+  requirements: string[];
+  funderProfile: string;
+  notes: string;
+}
+
+interface OverviewTabProps {
+  grant: Grant;
+}
+
+export const OverviewTab = ({ grant }: OverviewTabProps) => {
   return (
     <div className="space-y-6">
       {/* AI Synopsis */}
@@ -26,7 +47,7 @@ export const OverviewTab = () => {
           <dl className="grid grid-cols-1 gap-3 text-sm">
             <div className="flex justify-between">
               <dt className="text-gray-600">Award Amount</dt>
-              <dd className="font-medium text-gray-900">$25,000 - $50,000</dd>
+              <dd className="font-medium text-gray-900">{grant.amount}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">Grant Term</dt>
@@ -34,11 +55,11 @@ export const OverviewTab = () => {
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">Application Deadline</dt>
-              <dd className="font-medium text-gray-900">July 15, 2024</dd>
+              <dd className="font-medium text-gray-900">{grant.deadline}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">Program Officer</dt>
-              <dd className="font-medium text-gray-900">Sarah Mitchell</dd>
+              <dd className="font-medium text-gray-900">{grant.contact}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">Contact Email</dt>

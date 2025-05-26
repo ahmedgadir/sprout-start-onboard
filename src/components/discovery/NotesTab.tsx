@@ -2,10 +2,29 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
-export const NotesTab = () => {
-  const [notes, setNotes] = useState(
-    'Initial thoughts:\n- Great fit for our senior nutrition program\n- Need to coordinate with @sarah.johnson on budget\n- Contact Maria for partnership letters\n\nNext steps:\n- Review application requirements in detail\n- Schedule team meeting to discuss approach'
-  );
+interface Grant {
+  id: string;
+  title: string;
+  funder: string;
+  amount: string;
+  deadline: string;
+  location: string;
+  tags: string[];
+  description: string;
+  contact: string;
+  website: string;
+  eligibility: string;
+  requirements: string[];
+  funderProfile: string;
+  notes: string;
+}
+
+interface NotesTabProps {
+  grant: Grant;
+}
+
+export const NotesTab = ({ grant }: NotesTabProps) => {
+  const [notes, setNotes] = useState(grant.notes);
 
   return (
     <div className="space-y-4">

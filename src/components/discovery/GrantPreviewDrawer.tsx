@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Star, Square, ChevronDown, ExternalLink, MapPin, Calendar, DollarSign, Users, Building } from 'lucide-react';
@@ -38,6 +39,16 @@ export const GrantPreviewDrawer = ({ grantId, onClose }: GrantPreviewDrawerProps
     notes: 'This grant aligns well with our mission and strategic goals.'
   };
 
+  // Mock fit data
+  const fitData = {
+    score: 87,
+    reasons: [
+      { category: 'Mission Alignment', description: 'Perfect match for community health focus' },
+      { category: 'Geographic Fit', description: 'Located in target service area' },
+      { category: 'Award Size', description: 'Within your typical funding range' }
+    ]
+  };
+
   const handleApplyForGrant = () => {
     navigate(`/context/${grantId}`);
   };
@@ -58,7 +69,7 @@ export const GrantPreviewDrawer = ({ grantId, onClose }: GrantPreviewDrawerProps
 
         {/* Grant Snapshot */}
         <div className="mb-6">
-          <FitSnapshot grant={grant} />
+          <FitSnapshot score={fitData.score} reasons={fitData.reasons} />
         </div>
 
         {/* Tabs */}

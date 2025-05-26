@@ -1,7 +1,28 @@
 
 import React from 'react';
 
-export const FunderProfileTab = () => {
+interface Grant {
+  id: string;
+  title: string;
+  funder: string;
+  amount: string;
+  deadline: string;
+  location: string;
+  tags: string[];
+  description: string;
+  contact: string;
+  website: string;
+  eligibility: string;
+  requirements: string[];
+  funderProfile: string;
+  notes: string;
+}
+
+interface FunderProfileTabProps {
+  grant: Grant;
+}
+
+export const FunderProfileTab = ({ grant }: FunderProfileTabProps) => {
   const givingData = [
     { year: '2019', amount: 2.8 },
     { year: '2020', amount: 3.2 },
@@ -57,7 +78,7 @@ export const FunderProfileTab = () => {
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">Geographic Focus</dt>
-              <dd className="font-medium text-gray-900">Erie County, NY</dd>
+              <dd className="font-medium text-gray-900">{grant.location}</dd>
             </div>
           </dl>
         </div>
@@ -68,7 +89,7 @@ export const FunderProfileTab = () => {
         <h4 className="font-medium text-gray-900 mb-3">Program Contact</h4>
         <div className="bg-gray-50 rounded-lg p-4">
           <div className="text-sm">
-            <p className="font-medium text-gray-900">Sarah Mitchell</p>
+            <p className="font-medium text-gray-900">{grant.contact}</p>
             <p className="text-gray-600">Senior Program Officer</p>
             <p className="text-gray-600 mt-2">smitchell@buffalofoundation.org</p>
             <p className="text-gray-600">(716) 555-0123</p>
